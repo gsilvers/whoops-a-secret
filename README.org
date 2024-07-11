@@ -1,0 +1,15 @@
+* Exfiltrate a Secret
+
+This repository is an example of how to extract secret data from a Github repository using only tools that Github makes available without merging anything to the main branch. While I fully expect that users and Github are aware that there are tons of ways to un-mask a secret after it's ingected into the runtime I do not believe users would suspect that they could do so using actions created by Github. In this case all that is required to execute the vulnerability is:
+
+- Access to run github actions in the repository
+- Access to raise a pull request in the repository
+- Access to use the secret
+- Github action runner with Cat
+- This github action step [[https://github.com/actions/upload-artifact/tree/releases/v1][here]]
+
+With only these tools one can access the plain text value of a secret within an github action.
+
+** Preparation
+
+This repository has a set of per environment secrets
