@@ -12,4 +12,4 @@ With only these tools one can access the plain text value of a secret within an 
 
 ** Preparation
 
-This repository has a set of per environment secrets
+This repository has a set of per environment secrets. There are two environments set up, dev and prod both of which simply have the default protection settings: [[./img/environments.png]] 
