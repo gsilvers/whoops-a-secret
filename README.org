@@ -1,15 +1,40 @@
 * Exfiltrate a Secret
 
-This repository is an example of how to extract secret data from a Github repository using only tools that Github makes available without merging anything to the main branch. While I fully expect that users and Github are aware that there are tons of ways to un-mask a secret after it's ingected into the runtime I do not believe users would suspect that they could do so using actions created by Github. In this case all that is required to execute the vulnerability is:
+This repository is an example of how to extract secret data from a Github repository using only tools that Github makes available without merging anything to the main branch. While I fully expect that users and Github are aware that there are tons of ways to un-mask a secret after it's injected into the runtime I do not believe users would suspect that they could do so using actions created by Github. In this case all that is required to execute the vulnerability is:
 
-- Access to run github actions in the repository
+- Access to run GitHub actions in the repository
 - Access to raise a pull request in the repository
 - Access to use the secret
-- Github action runner with Cat
-- This github action step [[https://github.com/actions/upload-artifact/tree/releases/v1][here]]
+- Github action runner with Cat and Echo
+- This GitHub action step [[https://github.com/actions/upload-artifact/tree/releases/v1][here]]
 
-With only these tools one can access the plain text value of a secret within an github action.
+With only these tools one can access the plain text value of a secret within an GitHub action.
 
 ** Preparation
 
-This repository has a set of per environment secrets. There are two environments set up, dev and prod both of which simply have the default protection settings: [[./img/environments.png]] 
+This repository has a set of per environment secrets. There are two environments set up, dev and prod both of which simply have the default protection settings: [[./img/environments.png]]
+
+Each environment then has a secret named "PRIVATE_KEY" which contain just the name of the environment dev or prod. You could imagine however this could be something like a decryption key used by the application that you use GitHub to inject when you deploy.
+
+These secrets are set up as such: [[./img/secrets.png]]
+
+** Exploit Overview
+
+So GitHub actions essentially give users fairly free reign to script a small virtual machine to do things using their repository. It's fair to assume engineers would be aware that since these machines can run arbitrary code, its impossible for Github to possibly block all ways of extracting a secret.
+
+I could download compiled code that GitHub cannot inspect onto the runner that reads the secret and emails it to me. However the same can be accomplished using tools Github provides. This exploit will:
+
+- Take the secret and inject it into the runtime as an environment variable
+- Inject it into a temporary file on the runner's file system.
+- Attempt to print it out. Github does an awesome job here. Despite me not directly printing the environment variable Github traces the lineage of the secret and prevents cat from outputting it to the screen. It is masked.
+- We will then use the artifact download workflow which then unfortunately allows us to display the secret out on the internet and do as we will with it.
+  - This will be done from a different user than the repository owner.
+  - This will all be done without merging to the main branch.
+
+** Exploit Remediation
+
+It's clear to me that permissions on who can run GitHub actions, perhaps from what branch we allow GitHub actions, likewise restrictions can be made simply on running GitHub actions to trusted users. However since GitHub seems to be able to trace the lineage of the secret in the masking they do to the raw cat command it would be great if this provided step could do the same.
+
+** Exploit Details
+
+
