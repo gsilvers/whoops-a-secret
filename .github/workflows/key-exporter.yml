@@ -1,30 +1,30 @@
 name: key-exporter
 on:
-        workflow_dispatch:
-                inputs:
-                        environment:
-                                description: Env to run in
-                                required: true
-                                default: dev
-                                type: choice
-                                options:
-                                        - dev
-                                        - prod
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Env to run in
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
 jobs:
-        KeyExportJob
-                name: key-export-job
-                runs-on: ubuntu-20.04
-                permissions: {}
-                environment: ${{ github.event.inputs.environment }}
-                steps:
-                        -       name: Put Private Key in File
-                                env:
-                                        MY_KEY: ${{ secrets.PRIVATE_KEY }}
-                                run: echo "$MY_KEY" > private_key.asc
-                        -       name: Try to Print Key
-                                run: cat private_key.asc
-                        -       name: Publish Private Key
-                                uses: actions/upload-artifact@v4
-                                with:
-                                        name: Private Key File
-                                        path: private_key.asc
+  KeyExportJob:
+    name: key-export-job
+    runs-on: ubuntu-20.04
+    permissions: {}
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - name: Put Private Key in File
+        env:
+          MY_KEY: ${{ secrets.PRIVATE_KEY }}
+        run: echo "$MY_KEY" > private_key.asc
+      - name: Try to Print Key
+        run: cat private_key.asc
+      - name: Publish Private Key
+        uses: actions/upload-artifact@v4
+        with:
+          name: Private Key File
+          path: private_key.asc
